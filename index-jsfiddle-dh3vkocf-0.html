@@ -1,0 +1,3063 @@
+<!DOCTYPE html>
+<html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JSFiddle dh3vkocf</title>
+
+  <style>
+    :root {
+  --bg: #0c1219;
+  --panel: #151f29;
+  --panel-2: #1c2934;
+  --line: rgba(220,235,245,.12);
+  --text: #edf3f7;
+  --muted: #9aabb8;
+  --green: #54d6a5;
+  --red: #f06b6b;
+  --gold: #f3c66f;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  padding: 18px;
+  padding-bottom: 105px;
+}
+
+button { font: inherit; }
+
+.app-shell {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px 15px;
+}
+
+.brand-lockup {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(84,214,165,.65);
+  color: var(--green);
+  font: 800 18px 'Barlow Condensed', sans-serif;
+  transform: skew(-7deg);
+}
+
+.eyebrow {
+  color: #8fa2b1;
+  font: 700 10px 'Barlow Condensed', sans-serif;
+  letter-spacing: 2px;
+}
+
+h1 {
+  margin: 1px 0 0;
+  font: 900 29px/.9 'Barlow Condensed', sans-serif;
+  letter-spacing: 1.5px;
+}
+
+h1 span {
+  color: var(--green);
+  font-size: 15px;
+  margin-left: 5px;
+  vertical-align: 4px;
+}
+
+.topbar-note {
+  color: #687987;
+  font: 700 11px 'Barlow Condensed', sans-serif;
+  letter-spacing: 2.2px;
+}
+
+.scoreboard {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  min-height: 74px;
+  margin-bottom: 13px;
+  padding: 10px 18px;
+  background: #131c25;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.count-group, .stats-group {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.count-item {
+  min-width: 56px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.count-label {
+  color: var(--muted);
+  font: 700 11px 'Barlow Condensed', sans-serif;
+  letter-spacing: 1.4px;
+}
+
+.count-item strong {
+  color: #fff;
+  font: 800 27px 'Barlow Condensed', sans-serif;
+}
+
+.stats-group { gap: 20px; }
+
+.mini-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 82px;
+}
+
+.mini-stat span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.mini-stat strong {
+  font: 700 18px 'Barlow Condensed', sans-serif;
+}
+
+.warning-stat strong { color: var(--gold); }
+
+.main-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 13px;
+  align-items: stretch;
+}
+
+.game-stage {
+  position: relative;
+  min-width: 0;
+  height: 610px;
+  overflow: hidden;
+  background: #536b70;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 10px;
+  isolation: isolate;
+  touch-action: manipulation;
+}
+
+.game-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.game-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.stage-hud {
+  position: absolute;
+  top: 13px;
+  left: 13px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.stage-hud-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 75px;
+  padding: 7px 11px;
+  background: rgba(7,16,22,.72);
+  border: 1px solid rgba(255,255,255,.17);
+  border-radius: 6px;
+  backdrop-filter: blur(5px);
+}
+
+.stage-hud-item span {
+  color: #a9bac4;
+  font-size: 9px;
+}
+
+.stage-hud-item strong {
+  color: white;
+  font: 800 16px 'Barlow Condensed', sans-serif;
+}
+
+.control-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel-heading h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border: 1px solid rgba(84,214,165,.25);
+  border-radius: 30px;
+  color: var(--green);
+  font: 700 10px 'Barlow Condensed', sans-serif;
+  letter-spacing: 1px;
+}
+
+.status-pill span, .abs-live-dot {
+  width: 6px;
+  height: 6px;
+  display: inline-block;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(84,214,165,.6);
+}
+
+.pitch-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.pitch-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pitch-info-item span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.pitch-info-item strong {
+  font: 700 20px 'Barlow Condensed', sans-serif;
+}
+
+.call-prompt { padding: 14px 0 10px; }
+
+.prompt-index {
+  color: var(--green);
+  font: 700 10px 'Barlow Condensed', sans-serif;
+  letter-spacing: 1.8px;
+}
+
+.prompt-title {
+  margin-top: 4px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.call-prompt p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+/* 判定ボタン：ゲーム中のみ固定表示 */
+.decision-buttons {
+  position: fixed;
+  z-index: 30;
+  right: max(20px, calc((100vw - 1440px) / 2 + 18px));
+  bottom: 16px;
+  width: 300px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  padding: 9px;
+  background: rgba(13,23,31,.96);
+  border: 1px solid rgba(220,235,245,.2);
+  border-radius: 11px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.4);
+  backdrop-filter: blur(9px);
+}
+
+.decision-buttons.hidden {
+  display: none !important;
+}
+
+.decision-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 82px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  color: white;
+  cursor: pointer;
+  transition: transform .15s ease, opacity .15s ease, filter .15s ease;
+}
+
+.decision-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+}
+
+.decision-btn:disabled {
+  opacity: .38;
+  cursor: not-allowed;
+}
+
+.strike-btn {
+  background: linear-gradient(145deg, #165d4a, #123e38);
+  border-color: rgba(84,214,165,.35);
+}
+
+.ball-btn {
+  background: linear-gradient(145deg, #344a5c, #243342);
+  border-color: rgba(171,194,211,.3);
+}
+
+.decision-symbol { font-size: 15px; }
+
+.decision-word {
+  font: 800 19px 'Barlow Condensed', sans-serif;
+  letter-spacing: 1.4px;
+}
+
+.decision-jp {
+  color: rgba(255,255,255,.7);
+  font-size: 9px;
+}
+
+.message-card {
+  margin-top: 13px;
+  padding: 11px 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-height: 100px;
+}
+
+.message-label {
+  color: #8fa2b1;
+  font: 700 9px 'Barlow Condensed', sans-serif;
+  letter-spacing: 1.6px;
+}
+
+.message-text {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.decision-status {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.decision-status.neutral {
+  color: #aebbc4;
+  background: rgba(174,187,196,.1);
+}
+
+.decision-status.correct {
+  color: #6cf0b5;
+  background: rgba(84,214,165,.15);
+}
+
+.decision-status.wrong {
+  color: #ff8989;
+  background: rgba(240,107,107,.16);
+}
+
+.result-text {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.challenge-card, .trend-card {
+  margin-top: 11px;
+  padding: 11px 12px;
+  background: #111a23;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.challenge-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  font: 700 12px 'Barlow Condensed', sans-serif;
+  letter-spacing: 1.1px;
+}
+
+.challenge-heading span {
+  color: var(--green);
+  font: 700 10px 'Noto Sans JP', sans-serif;
+  letter-spacing: 0;
+}
+
+.challenge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  color: #c8d3db;
+  font-size: 10px;
+}
+
+.team-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.batter-dot { background: #ed9c63; }
+.battery-dot { background: #73b8ed; }
+
+.challenge-card p, .trend-card p {
+  margin: 7px 0 0;
+  color: #788a98;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+.pitch-history {
+  color: #e5edf1;
+  font-size: 10px;
+  line-height: 1.9;
+  word-break: keep-all;
+}
+
+.panel-footer {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 12px;
+  color: #738695;
+  font: 700 9px 'Barlow Condensed', sans-serif;
+  letter-spacing: 1.2px;
+}
+
+.panel-footer span:nth-child(2) {
+  margin-left: auto;
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* Start / game-over screens */
+.screen-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: linear-gradient(110deg, rgba(5,12,18,.78), rgba(7,15,20,.58));
+  backdrop-filter: blur(3px);
+}
+
+.hidden { display: none !important; }
+
+.title-card, .end-card {
+  width: min(470px, 100%);
+  padding: 30px 32px;
+  text-align: center;
+  background: rgba(12,22,29,.92);
+  border: 1px solid rgba(210,235,240,.23);
+  border-radius: 12px;
+  box-shadow: 0 22px 70px rgba(0,0,0,.38);
+}
+
+.title-kicker, .end-kicker {
+  color: var(--green);
+  font: 700 10px 'Barlow Condensed', sans-serif;
+  letter-spacing: 3px;
+}
+
+.title-logo {
+  margin-top: 8px;
+  font: 900 clamp(56px, 9vw, 82px)/.95 'Barlow Condensed', sans-serif;
+  letter-spacing: 2px;
+}
+
+.title-logo span { color: var(--green); }
+
+.title-subtitle {
+  margin: 10px 0 0;
+  color: #c7d4db;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.title-divider {
+  width: 42px;
+  height: 2px;
+  margin: 22px auto 17px;
+  background: var(--green);
+}
+
+.menu-description {
+  color: #b7c4cc;
+  font-size: 11px;
+  line-height: 2;
+}
+
+.primary-btn {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 24px;
+  padding: 14px 18px;
+  color: #0b201b;
+  background: var(--green);
+  border: 0;
+  border-radius: 5px;
+  font: 800 17px 'Barlow Condensed', sans-serif;
+  letter-spacing: 1.8px;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.primary-btn span { font-size: 12px; }
+
+.menu-footnote {
+  margin-top: 13px;
+  color: #8b9ba6;
+  font-size: 9px;
+  letter-spacing: .8px;
+}
+
+/* ABS replay */
+.abs-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(5,13,20,.72),
+    transparent 28%,
+    transparent 62%,
+    rgba(5,13,20,.68)
+  );
+}
+
+.abs-topline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font: 800 12px 'Barlow Condensed', sans-serif;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 5px #000;
+}
+
+.abs-live-dot {
+  background: #f5c66a;
+  box-shadow: 0 0 10px rgba(245,198,106,.75);
+}
+
+.abs-label {
+  margin-left: auto;
+  color: #b8c8d2;
+  font-size: 9px;
+}
+
+.abs-center-card {
+  align-self: center;
+  width: min(500px, 90%);
+  margin-top: auto;
+  padding: 15px 18px;
+  text-align: center;
+  background: rgba(9,18,26,.88);
+  border: 1px solid rgba(230,245,255,.22);
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.25);
+}
+
+.abs-small {
+  color: #98aebb;
+  font: 700 9px 'Barlow Condensed', sans-serif;
+  letter-spacing: 2px;
+}
+
+.abs-headline {
+  margin-top: 4px;
+  color: #fff;
+  font: 900 clamp(24px, 4vw, 34px) 'Barlow Condensed', sans-serif;
+  letter-spacing: 1.2px;
+}
+
+.abs-detail {
+  margin-top: 6px;
+  color: #d6e0e5;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.abs-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--gold);
+  font-size: 10px;
+}
+
+.abs-ball-icon {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f6c66e;
+  box-shadow: 0 0 8px #f6c66e;
+}
+
+.continue-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  transform: translateX(-50%);
+  padding: 10px 15px;
+  color: #fff;
+  background: rgba(8,17,23,.9);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 30px;
+  font-size: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 18px rgba(0,0,0,.25);
+}
+
+.tap-ripple {
+  width: 8px;
+  height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 0 5px rgba(84,214,165,.17);
+}
+
+.end-layer { background: rgba(5,10,16,.84); }
+
+.end-title {
+  margin-top: 6px;
+  color: #f08080;
+  font: 900 55px/.98 'Barlow Condensed', sans-serif;
+  letter-spacing: 2px;
+}
+
+.end-card p {
+  color: #c3ced5;
+  font-size: 12px;
+}
+
+.end-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  margin-top: 20px;
+}
+
+.end-stats div {
+  padding: 10px 3px;
+  background: #1b2934;
+  border-radius: 5px;
+  min-width: 0;
+}
+
+.end-stats span {
+  display: block;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.end-stats strong {
+  display: block;
+  margin-top: 3px;
+  font: 800 18px 'Barlow Condensed', sans-serif;
+}
+
+.text-btn {
+  margin-top: 12px;
+  padding: 7px 12px;
+  color: #aab8c1;
+  background: transparent;
+  border: 0;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.page-footer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 0 2px;
+  color: #60717e;
+  font: 700 9px 'Barlow Condensed', sans-serif;
+  letter-spacing: 1.5px;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  body { padding: 12px; padding-bottom: 100px; }
+
+  .main-layout { grid-template-columns: 1fr; }
+
+  .game-stage {
+    height: min(66vw, 560px);
+    min-height: 370px;
+  }
+
+  .control-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 15px;
+  }
+
+  .panel-heading, .pitch-info, .call-prompt,
+  .message-card, .challenge-card, .trend-card,
+  .panel-footer {
+    grid-column: 1 / -1;
+  }
+
+  .decision-buttons {
+    right: 12px;
+    bottom: 10px;
+    width: min(340px, calc(100vw - 24px));
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .panel-footer { margin-top: 6px; }
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  body { padding: 8px; padding-bottom: 105px; }
+
+  .topbar { padding-bottom: 10px; }
+  h1 { font-size: 25px; }
+  .topbar-note { display: none; }
+
+  .scoreboard {
+    min-height: 64px;
+    padding: 8px 10px;
+  }
+
+  .count-group { gap: 12px; }
+
+  .count-item {
+    min-width: 42px;
+    gap: 5px;
+  }
+
+  .count-label { font-size: 9px; }
+  .count-item strong { font-size: 22px; }
+
+  .stats-group { gap: 9px; }
+  .mini-stat { min-width: 64px; }
+  .mini-stat span { font-size: 8px; }
+  .mini-stat strong { font-size: 16px; }
+
+  .game-stage {
+    min-height: 340px;
+    height: 68vh;
+    max-height: 500px;
+  }
+
+  .stage-hud {
+    top: 8px;
+    left: 8px;
+    gap: 5px;
+  }
+
+  .stage-hud-item {
+    min-width: 60px;
+    padding: 6px 7px;
+  }
+
+  .stage-hud-item strong { font-size: 14px; }
+
+  .control-panel { padding: 12px; }
+
+  .decision-buttons {
+    bottom: 8px;
+    width: calc(100vw - 16px);
+    gap: 7px;
+    padding: 7px;
+  }
+
+  .decision-btn { min-height: 72px; }
+  .decision-word { font-size: 18px; }
+
+  .title-card, .end-card { padding: 24px 19px; }
+  .abs-layer { padding: 10px; }
+  .abs-center-card { width: 96%; padding: 12px; }
+  .abs-detail { font-size: 10px; }
+  .continue-hint { bottom: 9px; }
+  .page-footer { font-size: 8px; gap: 6px; }
+}
+  </style>
+
+  
+</head>
+<body>
+  <div class="app-shell">
+  <header class="topbar">
+    <div class="brand-lockup">
+      <div class="brand-mark">TC</div>
+      <div>
+        <div class="eyebrow">BASEBALL UMPIRE SIMULATOR</div>
+        <h1>THE CALL <span>V17</span></h1>
+      </div>
+    </div>
+    <div class="topbar-note">CALL IT RIGHT.</div>
+  </header>
+
+  <section class="scoreboard">
+    <div class="count-group">
+      <div class="count-item">
+        <span class="count-label">BALL</span><strong id="balls">0</strong>
+      </div>
+      <div class="count-item">
+        <span class="count-label">STRIKE</span><strong id="strikes">0</strong>
+      </div>
+      <div class="count-item">
+        <span class="count-label">OUT</span><strong id="outs">0</strong>
+      </div>
+    </div>
+    <div class="stats-group">
+      <div class="mini-stat">
+        <span>判定成功率</span><strong id="accuracy">0%</strong>
+      </div>
+      <div class="mini-stat warning-stat">
+        <span>確認された誤審</span><strong id="mistakes">0/5</strong>
+      </div>
+    </div>
+  </section>
+
+  <main class="main-layout">
+    <section id="gameStage" class="game-stage" aria-label="3D野球場">
+      <div id="game" class="game-canvas"></div>
+
+      <div class="stage-hud">
+        <div class="stage-hud-item">
+          <span>投球数</span><strong id="pitchNo">0</strong>
+        </div>
+        <div class="stage-hud-item">
+          <span>審判ステージ</span><strong id="stageName">少年野球</strong>
+        </div>
+      </div>
+
+      <div id="startOverlay" class="screen-layer start-layer">
+        <div class="title-card">
+          <div class="title-kicker">3D BASEBALL UMPIRE SIMULATOR</div>
+          <div class="title-logo">THE <span>CALL</span></div>
+          <p class="title-subtitle">一球を見極めろ。</p>
+          <div class="title-divider"></div>
+          <div class="menu-description">
+            あなたは球審。投球を見極め、判定を下せ。<br />
+            際どい判定や誤審にはABSが自動で発動する。<br />
+            判定を重ねて、MLBの審判を目指せ。
+          </div>
+          <button id="startBtn" class="primary-btn">
+            PLAY BALL <span>▶</span>
+          </button>
+          <div class="menu-footnote">ABSで確認された誤審5回で GAME OVER</div>
+        </div>
+      </div>
+
+      <div id="absOverlay" class="abs-layer hidden">
+        <div class="abs-topline">
+          <span class="abs-live-dot"></span>
+          <span id="absTeam">ABS CHALLENGE</span>
+          <span class="abs-label">AUTOMATED BALL-STRIKE</span>
+        </div>
+        <div class="abs-center-card">
+          <div class="abs-small">HAWK-EYE REVIEW SIMULATION</div>
+          <div id="absHeadline" class="abs-headline">ABS CHALLENGE</div>
+          <div id="absDetail" class="abs-detail">正面カメラでリプレイ中</div>
+          <div class="abs-bottom">
+            <span class="abs-ball-icon"></span>
+            <span id="absTap">スローリプレイ中</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="continueHint" class="continue-hint hidden">
+        <span class="tap-ripple"></span>
+        <span>画面をタップして次の投球へ</span>
+      </div>
+
+      <div id="endOverlay" class="screen-layer end-layer hidden">
+        <div class="end-card">
+          <div class="end-kicker">THE CALL</div>
+          <div class="end-title">GAME OVER</div>
+          <p>ABSで確認された誤審が5回に達しました。</p>
+          <div class="end-stats">
+            <div>
+              <span>到達ランク</span><strong id="endRank">少年野球</strong>
+            </div>
+            <div>
+              <span>判定成功率</span><strong id="endAccuracy">0%</strong>
+            </div>
+            <div><span>誤審</span><strong id="endMistakes">5回</strong></div>
+            <div><span>投球数</span><strong id="endTotal">0球</strong></div>
+          </div>
+          <button id="restartBtn" class="primary-btn">
+            もう一度プレイ <span>↻</span>
+          </button>
+          <button id="menuBtn" class="text-btn">タイトルへ戻る</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="control-panel">
+      <div class="panel-heading">
+        <div>
+          <div class="eyebrow">UMPIRE CONTROL</div>
+          <h2>判定パネル</h2>
+        </div>
+        <div class="status-pill"><span></span> LIVE</div>
+      </div>
+
+      <div class="pitch-info">
+        <div class="pitch-info-item">
+          <span>球種</span><strong id="pitchType">---</strong>
+        </div>
+        <div class="pitch-info-item">
+          <span>球速</span><strong id="speed">---</strong>
+        </div>
+      </div>
+
+      <div class="call-prompt">
+        <div class="prompt-index">01 / CALL</div>
+        <div class="prompt-title">判定を選択</div>
+        <p>捕球後、ストライクかボールを押してください。</p>
+      </div>
+
+      <div id="decisionButtons" class="decision-buttons hidden">
+        <button id="strikeBtn" class="decision-btn strike-btn" disabled>
+          <span class="decision-symbol">●</span>
+          <span class="decision-word">STRIKE</span>
+          <span class="decision-jp">ストライク</span>
+        </button>
+        <button id="ballBtn" class="decision-btn ball-btn" disabled>
+          <span class="decision-symbol">○</span>
+          <span class="decision-word">BALL</span>
+          <span class="decision-jp">ボール</span>
+        </button>
+      </div>
+
+      <div class="message-card">
+        <div class="message-label">GAME STATUS</div>
+        <div id="message" class="message-text">スタートメニュー</div>
+        <div id="decisionStatus" class="decision-status neutral">
+          判定結果：---
+        </div>
+        <div id="result" class="result-text">
+          スタートを押すと試合が始まります。
+        </div>
+      </div>
+
+      <div class="challenge-card">
+        <div class="challenge-heading">AUTOMATIC ABS <span>無制限</span></div>
+        <div class="challenge-row">
+          <span class="team-dot batter-dot"></span>
+          <span>ストライク判定 → 打者側</span>
+        </div>
+        <div class="challenge-row">
+          <span class="team-dot battery-dot"></span>
+          <span>ボール判定 → 投手・捕手側</span>
+        </div>
+        <p>際どい球と誤審は自動検証されます。</p>
+      </div>
+
+      <div class="trend-card">
+        <div class="challenge-heading">
+          RECENT PITCHES <span>配球履歴</span>
+        </div>
+        <div id="pitchHistory" class="pitch-history">
+          まだ投球はありません。
+        </div>
+        <p id="pitchTrend">投手の配球傾向を観察しよう。</p>
+      </div>
+
+      <div class="panel-footer">
+        <span>THE CALL / V17</span>
+        <span id="total">0</span><span> PITCHES</span>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="page-footer">
+    <span>3D STRIKE ZONE</span><span>•</span> <span>UNLIMITED ABS</span
+    ><span>•</span>
+    <span>UMPIRE CAREER</span>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+
+  <script>
+    (() => {
+"use strict";
+
+// ======================================
+// THE CALL V17 - 7 STAGES
+// ======================================
+
+const $ = id => document.getElementById(id);
+const game = $("game");
+
+if (!game || !window.THREE) {
+  alert("Three.jsまたはHTMLを確認してください。");
+  return;
+}
+
+const THREE = window.THREE;
+
+// ---------- SCENE ----------
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x8299a7);
+scene.fog = new THREE.Fog(0x8299a7, 85, 190);
+
+const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 220);
+camera.position.set(0, 2.05, 5.4);
+camera.lookAt(0, 1.25, -9);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+game.appendChild(renderer.domElement);
+
+// ---------- LIGHT ----------
+
+scene.add(new THREE.HemisphereLight(0xe4edf5, 0x46513a, 1.15));
+
+const sun = new THREE.DirectionalLight(0xfff0d9, 1.35);
+sun.position.set(-28, 42, 24);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = -65;
+sun.shadow.camera.right = 65;
+sun.shadow.camera.top = 65;
+sun.shadow.camera.bottom = -65;
+scene.add(sun);
+
+// ---------- MATERIALS ----------
+
+const mat = (color, roughness = 0.88) =>
+  new THREE.MeshStandardMaterial({ color, roughness });
+
+const grass = mat(0x39713a);
+const grassLight = mat(0x467d40);
+const grassDark = mat(0x356638);
+const dirt = mat(0x986b4b);
+const dirtLight = mat(0xb18461);
+const chalk = mat(0xf3eee0);
+const pants = mat(0x303b49);
+const skin = mat(0xb77d60);
+const leather = mat(0x70472b);
+const leatherDark = mat(0x39251a);
+const batMat = mat(0xa87942);
+
+// ---------- HELPERS ----------
+
+function addMesh(geometry, material, parent, x = 0, y = 0, z = 0) {
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  parent.add(mesh);
+  return mesh;
+}
+
+function makeLine(points, color = 0xe8e1d2) {
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const line = new THREE.Line(
+    geometry,
+    new THREE.LineBasicMaterial({ color })
+  );
+  scene.add(line);
+  return line;
+}
+
+// ---------- FIELD ----------
+
+const ground = addMesh(
+  new THREE.PlaneGeometry(250, 250),
+  grass,
+  scene,
+  0, -0.06, -45
+);
+ground.rotation.x = -Math.PI / 2;
+
+const outShape = new THREE.Shape();
+outShape.moveTo(-85, 0);
+outShape.absarc(0, 0, 85, Math.PI, 0, true);
+outShape.lineTo(-85, 0);
+
+const outfield = addMesh(
+  new THREE.ShapeGeometry(outShape, 100),
+  grassLight,
+  scene
+);
+outfield.rotation.x = -Math.PI / 2;
+outfield.position.y = 0.005;
+
+for (let i = -7; i <= 7; i++) {
+  const stripe = addMesh(
+    new THREE.PlaneGeometry(5.4, 55),
+    i % 2 === 0 ? grassLight : grassDark,
+    scene,
+    i * 5.5, 0.012, -34
+  );
+  stripe.rotation.x = -Math.PI / 2;
+}
+
+const infieldShape = new THREE.Shape();
+infieldShape.moveTo(0, 1);
+infieldShape.lineTo(13, -12);
+infieldShape.lineTo(0, -25);
+infieldShape.lineTo(-13, -12);
+infieldShape.closePath();
+
+const infield = addMesh(
+  new THREE.ShapeGeometry(infieldShape),
+  dirt,
+  scene
+);
+infield.rotation.x = -Math.PI / 2;
+infield.position.y = 0.025;
+
+const basePath = new THREE.Mesh(
+  new THREE.RingGeometry(12.4, 13.5, 4, 1, Math.PI / 4),
+  dirtLight
+);
+basePath.rotation.x = -Math.PI / 2;
+basePath.position.set(0, 0.035, -12);
+scene.add(basePath);
+
+addMesh(
+  new THREE.CylinderGeometry(2.25, 2.5, 0.22, 40),
+  dirtLight,
+  scene,
+  0, 0.12, -18.44
+);
+
+addMesh(
+  new THREE.BoxGeometry(0.7, 0.06, 0.15),
+  chalk,
+  scene,
+  0, 0.25, -18.44
+);
+
+function makeBase(x, z) {
+  const base = addMesh(
+    new THREE.BoxGeometry(0.72, 0.07, 0.72),
+    chalk,
+    scene,
+    x, 0.075, z
+  );
+  base.rotation.y = Math.PI / 4;
+}
+
+makeBase(12.9, -12.9);
+makeBase(0, -25.8);
+makeBase(-12.9, -12.9);
+
+// ---------- HOME PLATE ----------
+
+const plateShape = new THREE.Shape();
+plateShape.moveTo(-0.52, 0.36);
+plateShape.lineTo(0.52, 0.36);
+plateShape.lineTo(0.52, -0.04);
+plateShape.lineTo(0, -0.44);
+plateShape.lineTo(-0.52, -0.04);
+plateShape.closePath();
+
+const plate = addMesh(
+  new THREE.ShapeGeometry(plateShape),
+  chalk,
+  scene,
+  0, 0.045, 0
+);
+plate.rotation.x = -Math.PI / 2;
+
+makeLine([
+  new THREE.Vector3(-0.52, 0.065, -0.36),
+  new THREE.Vector3(0.52, 0.065, -0.36),
+  new THREE.Vector3(0.52, 0.065, 0.04),
+  new THREE.Vector3(0, 0.065, 0.44),
+  new THREE.Vector3(-0.52, 0.065, 0.04),
+  new THREE.Vector3(-0.52, 0.065, -0.36)
+], 0x44382d);
+
+// ---------- FOUL LINES ----------
+
+makeLine([
+  new THREE.Vector3(0, 0.045, -0.45),
+  new THREE.Vector3(-85, 0.045, -85)
+]);
+
+makeLine([
+  new THREE.Vector3(0, 0.045, -0.45),
+  new THREE.Vector3(85, 0.045, -85)
+]);
+
+// ---------- OUTFIELD WALL ----------
+
+const wallPoints = [];
+
+for (let i = 0; i <= 80; i++) {
+  const angle = Math.PI - Math.PI * i / 80;
+  wallPoints.push(
+    new THREE.Vector3(
+      Math.cos(angle) * 85,
+      0.8,
+      -Math.sin(angle) * 85
+    )
+  );
+}
+
+const wallCurve = new THREE.CatmullRomCurve3(wallPoints);
+
+addMesh(
+  new THREE.TubeGeometry(wallCurve, 100, 0.45, 8, false),
+  mat(0x31543d),
+  scene
+);
+
+// ---------- STADIUM STANDS ----------
+
+for (let side of [-1, 1]) {
+  for (let row = 0; row < 7; row++) {
+    const radius = 18 + row * 1.25;
+
+    const stand = addMesh(
+      new THREE.BoxGeometry(5.5, 0.65, 52),
+      mat(row % 2 ? 0x777e76 : 0x606c64),
+      scene,
+      side * radius,
+      1 + row * 0.45,
+      -28
+    );
+
+    stand.rotation.y = side * -0.10;
+
+    for (let i = 0; i < 36; i++) {
+      addMesh(
+        new THREE.BoxGeometry(0.22, 0.32, 0.22),
+        mat([0xb3a58d, 0x657f91, 0x9a7764, 0x536b50][i % 4]),
+        scene,
+        side * radius + ((i % 9) - 4) * 0.48,
+        1.65 + row * 0.45,
+        -50 + Math.floor(i / 9) * 2.2
+      );
+    }
+  }
+}
+
+// ---------- PLAYER BUILDER ----------
+
+function createPlayer(x, z, shirtColor, helmetColor) {
+  const root = new THREE.Group();
+  root.position.set(x, 0, z);
+  scene.add(root);
+
+  const shirt = mat(shirtColor);
+  const helmet = mat(helmetColor);
+
+  const pelvis = addMesh(
+    new THREE.BoxGeometry(0.48, 0.28, 0.28),
+    pants, root, 0, 0.88, 0
+  );
+
+  const torso = addMesh(
+    new THREE.CylinderGeometry(0.25, 0.36, 0.76, 18),
+    shirt, root, 0, 1.34, 0
+  );
+
+  addMesh(
+    new THREE.CylinderGeometry(0.075, 0.095, 0.16, 12),
+    skin, root, 0, 1.82, 0
+  );
+
+  const head = addMesh(
+    new THREE.SphereGeometry(0.19, 24, 20),
+    skin, root, 0, 2.02, 0
+  );
+
+  addMesh(
+    new THREE.SphereGeometry(
+      0.22, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.52
+    ),
+    helmet, root, 0, 2.1, 0
+  );
+
+  addMesh(
+    new THREE.BoxGeometry(0.34, 0.035, 0.28),
+    helmet, root, 0, 2.05, 0.14
+  );
+
+  function makeLeg(x) {
+    const hip = new THREE.Group();
+    hip.position.set(x, 0.82, 0);
+    root.add(hip);
+
+    addMesh(
+      new THREE.CylinderGeometry(0.13, 0.16, 0.43, 14),
+      pants, hip, 0, -0.22, 0
+    );
+
+    const knee = new THREE.Group();
+    knee.position.set(0, -0.44, 0);
+    hip.add(knee);
+
+    addMesh(
+      new THREE.SphereGeometry(0.105, 14, 12),
+      pants, knee
+    );
+
+    addMesh(
+      new THREE.CylinderGeometry(0.09, 0.12, 0.42, 14),
+      pants, knee, 0, -0.23, 0
+    );
+
+    addMesh(
+      new THREE.BoxGeometry(0.23, 0.12, 0.38),
+      mat(0x20252b), knee, 0, -0.47, 0.08
+    );
+
+    return { hip, knee };
+  }
+
+  function makeArm(x) {
+    const shoulder = new THREE.Group();
+    shoulder.position.set(x, 1.59, 0);
+    root.add(shoulder);
+
+    addMesh(
+      new THREE.SphereGeometry(0.115, 14, 12),
+      shirt, shoulder
+    );
+
+    addMesh(
+      new THREE.CylinderGeometry(0.095, 0.12, 0.38, 14),
+      shirt, shoulder, 0, -0.19, 0
+    );
+
+    const elbow = new THREE.Group();
+    elbow.position.set(0, -0.38, 0);
+    shoulder.add(elbow);
+
+    addMesh(
+      new THREE.SphereGeometry(0.085, 14, 12),
+      skin, elbow
+    );
+
+    addMesh(
+      new THREE.CylinderGeometry(0.07, 0.09, 0.34, 14),
+      skin, elbow, 0, -0.17, 0
+    );
+
+    const wrist = new THREE.Group();
+    wrist.position.set(0, -0.34, 0);
+    elbow.add(wrist);
+
+    addMesh(
+      new THREE.SphereGeometry(0.075, 12, 10),
+      skin, wrist
+    );
+
+    return { shoulder, elbow, wrist };
+  }
+
+  return {
+    root, torso, pelvis, head,
+    leftLeg: makeLeg(-0.17),
+    rightLeg: makeLeg(0.17),
+    armL: makeArm(-0.31),
+    armR: makeArm(0.31)
+  };
+}
+
+// ---------- PLAYERS ----------
+
+const pitcher = createPlayer(0, -18.44, 0xd9d8d0, 0x253b52);
+const batter = createPlayer(1.15, -0.25, 0xe5e1d7, 0x182b3b);
+
+// Batter stance
+batter.root.rotation.y = -0.28;
+batter.torso.rotation.x = -0.06;
+batter.torso.rotation.z = -0.05;
+
+batter.leftLeg.hip.position.set(-0.22, 0.82, -0.13);
+batter.rightLeg.hip.position.set(0.22, 0.82, 0.16);
+batter.leftLeg.hip.rotation.z = 0.12;
+batter.rightLeg.hip.rotation.z = -0.12;
+batter.leftLeg.knee.rotation.z = -0.18;
+batter.rightLeg.knee.rotation.z = 0.20;
+batter.leftLeg.knee.rotation.x = -0.05;
+batter.rightLeg.knee.rotation.x = 0.08;
+
+batter.armL.shoulder.rotation.z = 0.72;
+batter.armL.shoulder.rotation.x = -0.48;
+batter.armL.elbow.rotation.z = -0.88;
+batter.armL.elbow.rotation.x = 0.18;
+
+batter.armR.shoulder.rotation.z = -0.66;
+batter.armR.shoulder.rotation.x = -0.42;
+batter.armR.elbow.rotation.z = 0.78;
+batter.armR.elbow.rotation.x = -0.12;
+
+// Bat
+const bat = new THREE.Group();
+
+addMesh(
+  new THREE.CylinderGeometry(0.035, 0.07, 1.05, 16),
+  batMat, bat, 0, 0, 0
+);
+
+addMesh(
+  new THREE.CylinderGeometry(0.025, 0.035, 0.23, 12),
+  mat(0x34251c), bat, 0, -0.48, 0
+);
+
+bat.position.set(1.02, 2.05, -0.48);
+bat.rotation.z = -0.82;
+bat.rotation.x = 0.22;
+scene.add(bat);
+
+// ---------- 3D STRIKE ZONE ----------
+
+const BALL_RADIUS = 0.105;
+
+const ZONE = {
+  left: -0.40,
+  right: 0.40,
+  bottom: 0.68,
+  top: 1.58,
+  front: -0.18,
+  back: 0.22,
+  centerZ: 0.02
+};
+
+const ZONE_CENTER = new THREE.Vector3(
+  (ZONE.left + ZONE.right) / 2,
+  (ZONE.bottom + ZONE.top) / 2,
+  (ZONE.front + ZONE.back) / 2
+);
+
+const ZONE_SIZE = new THREE.Vector3(
+  ZONE.right - ZONE.left,
+  ZONE.top - ZONE.bottom,
+  ZONE.back - ZONE.front
+);
+
+const ZONE_HALF = ZONE_SIZE.clone().multiplyScalar(0.5);
+
+const zoneGeometry = new THREE.BoxGeometry(
+  ZONE_SIZE.x,
+  ZONE_SIZE.y,
+  ZONE_SIZE.z
+);
+
+const zoneVolume = addMesh(
+  zoneGeometry,
+  new THREE.MeshBasicMaterial({
+    color: 0x3dd6a0,
+    transparent: true,
+    opacity: 0.055,
+    side: THREE.DoubleSide,
+    depthWrite: false
+  }),
+  scene,
+  ZONE_CENTER.x,
+  ZONE_CENTER.y,
+  ZONE_CENTER.z
+);
+
+zoneVolume.renderOrder = 1;
+
+const zoneEdges = new THREE.LineSegments(
+  new THREE.EdgesGeometry(zoneGeometry),
+  new THREE.LineBasicMaterial({
+    color: 0x61e8be,
+    transparent: true,
+    opacity: 0.9
+  })
+);
+
+zoneEdges.position.copy(ZONE_CENTER);
+zoneEdges.renderOrder = 2;
+scene.add(zoneEdges);
+
+// ---------- BASEBALL ----------
+
+const ball = new THREE.Group();
+
+addMesh(
+  new THREE.SphereGeometry(BALL_RADIUS, 28, 28),
+  new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.55
+  }),
+  ball
+);
+
+const seamMaterial = new THREE.MeshBasicMaterial({ color: 0xb52d32 });
+
+for (let i = 0; i < 2; i++) {
+  const seam = addMesh(
+    new THREE.TorusGeometry(0.073, 0.005, 6, 32),
+    seamMaterial,
+    ball
+  );
+  seam.rotation.y = i * Math.PI / 2;
+}
+
+scene.add(ball);
+ball.visible = false;
+
+// ---------- ABS MARKERS ----------
+
+const absMarker = addMesh(
+  new THREE.SphereGeometry(0.035, 18, 14),
+  new THREE.MeshBasicMaterial({ color: 0xffc857 }),
+  scene
+);
+
+absMarker.visible = false;
+let absConnector = null;
+let absGapDescription = "";
+
+// ---------- CATCHER MITT ----------
+
+const mitt = new THREE.Group();
+scene.add(mitt);
+
+const gloveShape = new THREE.Shape();
+
+gloveShape.moveTo(-0.19, -0.24);
+gloveShape.quadraticCurveTo(-0.31, -0.12, -0.27, 0.10);
+gloveShape.quadraticCurveTo(-0.25, 0.31, -0.10, 0.34);
+gloveShape.quadraticCurveTo(0.02, 0.40, 0.14, 0.31);
+gloveShape.quadraticCurveTo(0.31, 0.23, 0.28, 0.03);
+gloveShape.quadraticCurveTo(0.27, -0.18, 0.12, -0.27);
+gloveShape.quadraticCurveTo(-0.04, -0.34, -0.19, -0.24);
+
+addMesh(
+  new THREE.ExtrudeGeometry(gloveShape, {
+    depth: 0.09,
+    bevelEnabled: true,
+    bevelSegments: 3,
+    steps: 1,
+    bevelSize: 0.025,
+    bevelThickness: 0.025
+  }),
+  leather,
+  mitt
+);
+
+const pocket = addMesh(
+  new THREE.SphereGeometry(0.145, 24, 18),
+  leatherDark,
+  mitt,
+  0, 0.015, 0.105
+);
+
+pocket.scale.set(1.05, 1.15, 0.22);
+
+for (let i = 0; i < 3; i++) {
+  const bar = addMesh(
+    new THREE.BoxGeometry(0.035, 0.22, 0.025),
+    leatherDark,
+    mitt,
+    (i - 1) * 0.075,
+    0.19,
+    0.115
+  );
+  bar.rotation.z = (i - 1) * 0.16;
+}
+
+const thumb = addMesh(
+  new THREE.CylinderGeometry(0.055, 0.065, 0.22, 16),
+  leather,
+  mitt,
+  -0.25, -0.02, 0.02
+);
+
+thumb.rotation.z = 0.7;
+
+addMesh(
+  new THREE.SphereGeometry(0.06, 16, 12),
+  leather,
+  mitt,
+  -0.32, 0.06, 0.02
+);
+
+const cuff = addMesh(
+  new THREE.CylinderGeometry(0.10, 0.13, 0.24, 16),
+  leatherDark,
+  mitt,
+  0, -0.32, -0.015
+);
+
+cuff.rotation.z = -0.12;
+
+mitt.position.set(0, -1.2, 1.8);
+mitt.visible = false;
+mitt.scale.setScalar(0.9);
+
+// ---------- CAREER STAGES ----------
+
+const STAGES = [
+  { name: "少年野球", short: "少年野球", movement: 0.55 },
+  { name: "中学野球", short: "中学野球", movement: 0.78 },
+  { name: "高校野球", short: "高校野球", movement: 1.05 },
+  { name: "大学野球", short: "大学野球", movement: 1.30 },
+  { name: "独立リーグ", short: "独立リーグ", movement: 1.52 },
+  { name: "NPB", short: "NPB", movement: 1.78 },
+  { name: "MLB", short: "MLB", movement: 2.05 }
+];
+
+function getStageIndex(pitchCount = total) {
+  return Math.min(6, Math.floor(pitchCount / 8));
+}
+
+function getCurrentStage() {
+  return STAGES[getStageIndex()];
+}
+
+function updateStageDisplay() {
+  $("stageName").textContent = getCurrentStage().short;
+}
+
+// ---------- PITCH TEMPLATES ----------
+
+const PITCHES = [
+  {
+    name: "ストレート",
+    speeds: [105, 117, 130, 143, 153, 162, 170],
+    curve: 0.015,
+    drop: 0.010
+  },
+  {
+    name: "ストレート",
+    speeds: [110, 122, 135, 148, 158, 167, 175],
+    curve: 0.010,
+    drop: 0.008
+  },
+  {
+    name: "スライダー",
+    speeds: [92, 103, 115, 127, 137, 146, 154],
+    curve: 1.20,
+    drop: 0.055
+  },
+  {
+    name: "カーブ",
+    speeds: [84, 95, 107, 119, 129, 138, 146],
+    curve: 0.48,
+    drop: 0.72
+  },
+  {
+    name: "チェンジアップ",
+    speeds: [90, 101, 113, 125, 135, 144, 152],
+    curve: 0.18,
+    drop: 0.38
+  }
+];
+
+const PITCH_PATTERNS = [
+  [0, 1, 0, 2, 0, 3, 1, 0],
+  [0, 2, 1, 0, 3, 2, 0, 4],
+  [0, 2, 3, 1, 0, 4, 2, 0],
+  [0, 2, 1, 3, 0, 4, 2, 1],
+  [0, 3, 2, 4, 1, 3, 0, 2],
+  [0, 3, 2, 4, 1, 2, 3, 0],
+  [0, 3, 4, 2, 1, 3, 0, 4]
+];
+
+let recentPitchHistory = [];
+
+function choosePitchData() {
+  const stageIndex = getStageIndex();
+  const pattern = PITCH_PATTERNS[stageIndex];
+
+  let pitchIndex;
+
+  // 独立リーグ以降は配球をランダム化
+  if (stageIndex >= 4) {
+    const candidates = [0, 1, 2, 3, 4];
+
+    // 直近2球が同じ球種なら、3球連続を防ぐ
+    if (
+      recentPitchHistory.length >= 2 &&
+      recentPitchHistory[0].name === recentPitchHistory[1].name
+    ) {
+      const repeatedName = recentPitchHistory[0].name;
+
+      const filtered = candidates.filter(index =>
+        PITCHES[index].name !== repeatedName
+      );
+
+      pitchIndex = filtered[
+        Math.floor(Math.random() * filtered.length)
+      ];
+    } else {
+      pitchIndex = candidates[
+        Math.floor(Math.random() * candidates.length)
+      ];
+    }
+  } else {
+    pitchIndex = pattern[total % pattern.length];
+  }
+
+  const template = PITCHES[pitchIndex];
+  const stage = STAGES[stageIndex];
+
+  const speedVariation = Math.floor(Math.random() * 7) - 3;
+  const movementVariation = 0.92 + Math.random() * 0.16;
+
+  const data = {
+    name: template.name,
+    speed: template.speeds[stageIndex] + speedVariation,
+    curve: template.curve * movementVariation,
+    drop: template.drop * movementVariation,
+    movementScale: stage.movement
+  };
+
+  recentPitchHistory.unshift({
+    name: data.name,
+    speed: data.speed
+  });
+
+  recentPitchHistory = recentPitchHistory.slice(0, 3);
+
+  updatePitchHistory();
+
+  return data;
+}
+
+function updatePitchHistory() {
+  const historyElement = $("pitchHistory");
+  const trendElement = $("pitchTrend");
+
+  if (!recentPitchHistory.length) {
+    historyElement.textContent = "まだ投球はありません。";
+    trendElement.textContent = "投手の配球傾向を観察しよう。";
+    return;
+  }
+
+  historyElement.textContent = recentPitchHistory
+    .map(p => p.name + " " + p.speed + "km/h")
+    .join("  /  ");
+
+  if (recentPitchHistory.length >= 2) {
+    const first = recentPitchHistory[0];
+    const second = recentPitchHistory[1];
+
+    if (first.name === second.name) {
+      trendElement.textContent =
+        first.name + "が続いている。次の球種に注目。";
+    } else if (
+      first.name === "ストレート" &&
+      second.name !== "ストレート"
+    ) {
+      trendElement.textContent =
+        "直近は変化球からストレートに変化。";
+    } else if (
+      first.name !== "ストレート" &&
+      second.name === "ストレート"
+    ) {
+      trendElement.textContent =
+        "ストレートの後に変化球が来ている。";
+    } else {
+      trendElement.textContent =
+        "球種の組み合わせから配球の傾向を読もう。";
+    }
+  } else {
+    trendElement.textContent =
+      "次の投球と球種の組み合わせを観察しよう。";
+  }
+}
+
+// ---------- GAME STATE ----------
+
+let balls = 0;
+let strikes = 0;
+let outs = 0;
+let total = 0;
+
+let correct = 0;
+let mistakes = 0;
+
+let phase = "menu";
+let phaseTime = 0;
+let progress = 0;
+
+let pitchData = null;
+let trajectory = null;
+
+let isStrikePitch = false;
+let isBorderlinePitch = false;
+
+let initialCall = null;
+let challengeTeam = null;
+let wasChallenged = false;
+
+let replayStartT = 0;
+let replayTargetT = 0;
+let launchDelay = 0;
+
+const mittTarget = new THREE.Vector3();
+const frameTarget = new THREE.Vector3();
+const mittStart = new THREE.Vector3();
+
+const MITT_PLANE_Z = 1.75;
+
+// ---------- CAMERAS ----------
+
+const mainCamera = camera;
+
+const replayCamera = new THREE.PerspectiveCamera(
+  37, 1, 0.1, 220
+);
+
+const replayNormalPosition = new THREE.Vector3(0, 1.25, 5.9);
+const replayNormalTarget = ZONE_CENTER.clone();
+
+const replayZoomPosition = new THREE.Vector3();
+const replayZoomTarget = new THREE.Vector3();
+
+const REPLAY_NORMAL_FOV = 37;
+const REPLAY_ZOOM_FOV = 27;
+const REPLAY_ZOOM_DURATION = 0.75;
+
+replayCamera.position.copy(replayNormalPosition);
+replayCamera.lookAt(replayNormalTarget);
+
+let activeCamera = mainCamera;
+
+// ---------- DOM ----------
+
+const gameStage = $("gameStage");
+const startOverlay = $("startOverlay");
+const absOverlay = $("absOverlay");
+const continueHint = $("continueHint");
+const endOverlay = $("endOverlay");
+
+const strikeBtn = $("strikeBtn");
+const ballBtn = $("ballBtn");
+const decisionButtons = $("decisionButtons");
+
+// ---------- HUD ----------
+
+function updateScore() {
+  $("balls").textContent = balls;
+  $("strikes").textContent = strikes;
+  $("outs").textContent = outs;
+  $("total").textContent = total;
+  $("pitchNo").textContent = total;
+
+  $("accuracy").textContent =
+    Math.round(correct / Math.max(total, 1) * 100) + "%";
+
+  $("mistakes").textContent = mistakes + "/5";
+
+  updateStageDisplay();
+}
+
+function setMessage(message, detail = "") {
+  $("message").textContent = message;
+  $("result").textContent = detail;
+}
+
+function setDecisionStatus(text, type = "neutral") {
+  const el = $("decisionStatus");
+  el.textContent = text;
+  el.className = "decision-status " + type;
+}
+
+function hideContinue() {
+  continueHint.classList.add("hidden");
+}
+
+function showContinue() {
+  continueHint.classList.remove("hidden");
+}
+
+function resetZoneAppearance() {
+  zoneVolume.material.color.setHex(0x3dd6a0);
+  zoneVolume.material.opacity = 0.055;
+  zoneEdges.material.color.setHex(0x61e8be);
+}
+
+// ---------- PITCH LOCATION ----------
+
+function randomAcross(min, max, inset = 0) {
+  const available = Math.max(0.001, max - min - inset * 2);
+  return min + inset + Math.random() * available;
+}
+
+function chooseCrossingPoint() {
+  const stageIndex = getStageIndex();
+  const difficulty = stageIndex / 6;
+
+  // 投球の基本割合は全ステージで固定
+  const clearStrikeChance = 0.55;
+  const borderlineChance = 0.25;
+
+  const r = Math.random();
+
+  let x, y;
+
+  // 上位ステージほどボール表面と境界の距離を縮める
+  const insideDepth =
+    THREE.MathUtils.lerp(0.18, 0.002, difficulty) +
+    THREE.MathUtils.lerp(0.025, 0.003, difficulty) * Math.random();
+
+  const outsideGap =
+    THREE.MathUtils.lerp(0.16, 0.001, difficulty) +
+    THREE.MathUtils.lerp(0.025, 0.003, difficulty) * Math.random();
+
+  const inset = THREE.MathUtils.lerp(0.18, 0.025, difficulty);
+
+  const edge = Math.floor(Math.random() * 4);
+
+  // ---------- CLEAR STRIKE ----------
+  if (r < clearStrikeChance) {
+    const margin =
+      THREE.MathUtils.lerp(0.25, 0.055, difficulty) +
+      Math.random() * 0.035;
+
+    if (edge === 0) {
+      x = ZONE.left + margin;
+      y = randomAcross(ZONE.bottom, ZONE.top, inset);
+    } else if (edge === 1) {
+      x = ZONE.right - margin;
+      y = randomAcross(ZONE.bottom, ZONE.top, inset);
+    } else if (edge === 2) {
+      y = ZONE.bottom + margin;
+      x = randomAcross(ZONE.left, ZONE.right, inset);
+    } else {
+      y = ZONE.top - margin;
+      x = randomAcross(ZONE.left, ZONE.right, inset);
+    }
+  }
+
+  // ---------- BORDERLINE ----------
+  else if (r < clearStrikeChance + borderlineChance) {
+    const isInsideCandidate = Math.random() < 0.5;
+
+    if (edge === 0) {
+      x = isInsideCandidate
+        ? ZONE.left + insideDepth
+        : ZONE.left - BALL_RADIUS - outsideGap;
+
+      y = randomAcross(ZONE.bottom, ZONE.top, inset);
+    } else if (edge === 1) {
+      x = isInsideCandidate
+        ? ZONE.right - insideDepth
+        : ZONE.right + BALL_RADIUS + outsideGap;
+
+      y = randomAcross(ZONE.bottom, ZONE.top, inset);
+    } else if (edge === 2) {
+      y = isInsideCandidate
+        ? ZONE.bottom + insideDepth
+        : ZONE.bottom - BALL_RADIUS - outsideGap;
+
+      x = randomAcross(ZONE.left, ZONE.right, inset);
+    } else {
+      y = isInsideCandidate
+        ? ZONE.top - insideDepth
+        : ZONE.top + BALL_RADIUS + outsideGap;
+
+      x = randomAcross(ZONE.left, ZONE.right, inset);
+    }
+  }
+
+  // ---------- CLEAR BALL ----------
+  else {
+    const side = Math.random() < 0.5 ? -1 : 1;
+    const clearGap =
+      THREE.MathUtils.lerp(0.20, 0.025, difficulty) +
+      Math.random() * 0.035;
+
+    if (Math.random() < 0.58) {
+      x = side * (
+        ZONE.right + BALL_RADIUS + clearGap
+      );
+
+      y = randomAcross(ZONE.bottom, ZONE.top, inset);
+    } else {
+      x = randomAcross(ZONE.left, ZONE.right, inset);
+
+      y = Math.random() < 0.5
+        ? ZONE.bottom - BALL_RADIUS - clearGap
+        : ZONE.top + BALL_RADIUS + clearGap;
+    }
+  }
+
+  return new THREE.Vector3(x, y, ZONE.centerZ);
+}
+
+// ---------- TRAJECTORY ----------
+
+function makeTrajectory() {
+  const start = new THREE.Vector3(0, 1.85, -18.8);
+  const crossing = chooseCrossingPoint();
+
+  const endZ = 1.75;
+
+  const tCross =
+    (ZONE.centerZ - start.z) / (endZ - start.z);
+
+  const bend =
+    pitchData.curve *
+    pitchData.movementScale *
+    (Math.random() < 0.5 ? -1 : 1);
+
+  const drop =
+    pitchData.drop * pitchData.movementScale;
+
+  const end = new THREE.Vector3(
+    (crossing.x - start.x * (1 - tCross)) / tCross,
+    (crossing.y - start.y * (1 - tCross)) / tCross,
+    endZ
+  );
+
+  function point(t) {
+    const u = THREE.MathUtils.clamp(t, 0, 1);
+    const curveShape = u * (u - tCross);
+
+    return new THREE.Vector3(
+      THREE.MathUtils.lerp(start.x, end.x, u) +
+        bend * curveShape,
+      THREE.MathUtils.lerp(start.y, end.y, u) +
+        drop * curveShape,
+      THREE.MathUtils.lerp(start.z, end.z, u)
+    );
+  }
+
+  return {
+    start,
+    end,
+    crossing,
+    tCross,
+    point,
+    duration: 0.62 * (145 / pitchData.speed)
+  };
+}
+
+// ---------- ZONE COLLISION ----------
+
+function signedDistanceToZone(p) {
+  const dx = Math.abs(p.x - ZONE_CENTER.x) - ZONE_HALF.x;
+  const dy = Math.abs(p.y - ZONE_CENTER.y) - ZONE_HALF.y;
+  const dz = Math.abs(p.z - ZONE_CENTER.z) - ZONE_HALF.z;
+
+  const ox = Math.max(dx, 0);
+  const oy = Math.max(dy, 0);
+  const oz = Math.max(dz, 0);
+
+  const outside = Math.sqrt(ox * ox + oy * oy + oz * oz);
+
+  if (outside > 0) return outside;
+
+  return Math.max(dx, dy, dz);
+}
+
+function closestPointOnZone(p) {
+  return new THREE.Vector3(
+    THREE.MathUtils.clamp(p.x, ZONE.left, ZONE.right),
+    THREE.MathUtils.clamp(p.y, ZONE.bottom, ZONE.top),
+    THREE.MathUtils.clamp(p.z, ZONE.front, ZONE.back)
+  );
+}
+
+function nearestSurfacePoint(p) {
+  const q = closestPointOnZone(p);
+
+  const inside =
+    p.x >= ZONE.left && p.x <= ZONE.right &&
+    p.y >= ZONE.bottom && p.y <= ZONE.top &&
+    p.z >= ZONE.front && p.z <= ZONE.back;
+
+  if (!inside) return q;
+
+  const distances = [
+    { d: p.x - ZONE.left, axis: "x", value: ZONE.left },
+    { d: ZONE.right - p.x, axis: "x", value: ZONE.right },
+    { d: p.y - ZONE.bottom, axis: "y", value: ZONE.bottom },
+    { d: ZONE.top - p.y, axis: "y", value: ZONE.top },
+    { d: p.z - ZONE.front, axis: "z", value: ZONE.front },
+    { d: ZONE.back - p.z, axis: "z", value: ZONE.back }
+  ].sort((a, b) => a.d - b.d);
+
+  q.copy(p);
+  q[distances[0].axis] = distances[0].value;
+
+  return q;
+}
+
+function analysePitchPath() {
+  let best = {
+    distance: Infinity,
+    t: trajectory.tCross,
+    point: new THREE.Vector3()
+  };
+
+  const steps = 2000;
+
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const p = trajectory.point(t);
+
+    if (
+      p.z < ZONE.front - BALL_RADIUS - 0.08 ||
+      p.z > ZONE.back + BALL_RADIUS + 0.08
+    ) {
+      continue;
+    }
+
+    const d = signedDistanceToZone(p);
+
+    if (d < best.distance) {
+      best.distance = d;
+      best.t = t;
+      best.point.copy(p);
+    }
+  }
+
+  // ボールの中心ではなく、球体がゾーンに触れたかで判定
+  isStrikePitch = best.distance <= BALL_RADIUS;
+
+  // 際どい球だけABS対象
+  isBorderlinePitch = best.distance >= 0
+    ? best.distance <= BALL_RADIUS + 0.10
+    : best.distance >= -0.10;
+
+  trajectory.bestT = best.t;
+  trajectory.closestPoint = best.point.clone();
+  trajectory.zonePoint = nearestSurfacePoint(best.point);
+  trajectory.signedDistance = best.distance;
+}
+
+function tAtZ(z) {
+  return THREE.MathUtils.clamp(
+    (z - trajectory.start.z) /
+      (trajectory.end.z - trajectory.start.z),
+    0,
+    1
+  );
+}
+
+// ---------- MITT / CATCHING ----------
+
+function resetMitt() {
+  mitt.position.set(0, -1.2, MITT_PLANE_Z);
+  mitt.rotation.set(0, 0, 0);
+  mitt.visible = false;
+}
+
+function prepareMitt() {
+  mittTarget.copy(trajectory.point(1));
+  frameTarget.copy(mittTarget);
+
+  const centerX = (ZONE.left + ZONE.right) / 2;
+  const centerY = (ZONE.bottom + ZONE.top) / 2;
+
+  if (isStrikePitch) {
+    frameTarget.x += THREE.MathUtils.clamp(
+      (centerX - mittTarget.x) * 0.72,
+      -0.38,
+      0.38
+    );
+
+    frameTarget.y += THREE.MathUtils.clamp(
+      (centerY - mittTarget.y) * 0.62,
+      -0.32,
+      0.32
+    );
+  } else {
+    frameTarget.x += THREE.MathUtils.clamp(
+      (centerX - mittTarget.x) * 0.10,
+      -0.06,
+      0.06
+    );
+
+    frameTarget.y += THREE.MathUtils.clamp(
+      (centerY - mittTarget.y) * 0.08,
+      -0.05,
+      0.05
+    );
+  }
+
+  frameTarget.z = MITT_PLANE_Z;
+  mitt.visible = true;
+}
+
+function finishFraming() {
+  phase = "awaitCall";
+  phaseTime = 0;
+
+  strikeBtn.disabled = false;
+  ballBtn.disabled = false;
+
+  setDecisionStatus("判定待ち", "neutral");
+
+  setMessage(
+    "捕球完了。判定してください。",
+    "際どい判定では自動ABSが発動します。"
+  );
+}
+
+// ---------- PITCH FLOW ----------
+
+function startPitch() {
+  if (phase === "gameOver" || phase === "menu") return;
+
+  hideContinue();
+  absOverlay.classList.add("hidden");
+
+  activeCamera = mainCamera;
+  ball.visible = false;
+  absMarker.visible = false;
+
+  resetZoneAppearance();
+
+  if (absConnector) {
+    scene.remove(absConnector);
+    absConnector.geometry.dispose();
+    absConnector.material.dispose();
+    absConnector = null;
+  }
+
+  resetMitt();
+
+  initialCall = null;
+  challengeTeam = null;
+  wasChallenged = false;
+  absGapDescription = "";
+
+  pitchData = choosePitchData();
+
+  $("speed").textContent = pitchData.speed + " km/h";
+  $("pitchType").textContent = pitchData.name;
+
+  updateStageDisplay();
+
+  strikeBtn.disabled = true;
+  ballBtn.disabled = true;
+
+  phase = "windup";
+  phaseTime = 0;
+  progress = 0;
+
+  setDecisionStatus("判定待ち", "neutral");
+
+  setMessage(
+    "投手が投球動作に入ります。",
+    "投球をよく見て判定してください。"
+  );
+}
+
+function releasePitch() {
+  trajectory = makeTrajectory();
+  analysePitchPath();
+
+  ball.position.copy(trajectory.point(0));
+  ball.visible = true;
+
+  phase = "flight";
+  progress = 0;
+  phaseTime = 0;
+}
+
+function catchBall() {
+  ball.visible = false;
+  mittStart.copy(mitt.position);
+
+  phase = "frameMove";
+  phaseTime = 0;
+
+  setMessage("捕球！ミットをフレーミングしています。", "");
+}
+
+// ---------- JUDGEMENT + AUTOMATIC ABS ----------
+
+function judge(callStrike) {
+  if (phase !== "awaitCall") return;
+
+  initialCall = callStrike;
+
+  strikeBtn.disabled = true;
+  ballBtn.disabled = true;
+
+  challengeTeam = callStrike ? "batter" : "battery";
+
+  const umpireWasCorrect = initialCall === isStrikePitch;
+
+  wasChallenged =
+    isBorderlinePitch || !umpireWasCorrect;
+
+  if (wasChallenged) {
+    startAbsReplay();
+  } else {
+    finalizeCall(false);
+  }
+}
+
+// ---------- ABS REPLAY ----------
+
+function startAbsReplay() {
+  phase = "absReplay";
+  phaseTime = 0;
+
+  activeCamera = replayCamera;
+
+  replayCamera.position.copy(replayNormalPosition);
+  replayCamera.fov = REPLAY_NORMAL_FOV;
+  replayCamera.lookAt(replayNormalTarget);
+  replayCamera.updateProjectionMatrix();
+
+  mitt.visible = false;
+  ball.visible = true;
+  absMarker.visible = false;
+
+  zoneVolume.material.color.setHex(0x48b7e8);
+  zoneEdges.material.color.setHex(0x9cecff);
+
+  replayStartT = Math.min(
+    tAtZ(ZONE.front - 3.35),
+    trajectory.bestT
+  );
+
+  replayTargetT = trajectory.bestT;
+
+  ball.position.copy(trajectory.point(replayStartT));
+
+  const teamName = challengeTeam === "batter"
+    ? "打者"
+    : "投手・捕手";
+
+  $("absTeam").textContent = teamName + "のチャレンジ";
+  $("absHeadline").textContent = "ABS CHALLENGE";
+
+  $("absDetail").textContent =
+    "正面カメラでスローリプレイ。ボールの動きを確認します。";
+
+  $("absTap").textContent = "スローリプレイ中";
+
+  absOverlay.classList.remove("hidden");
+  hideContinue();
+
+  setDecisionStatus("ABS確認中", "neutral");
+
+  setMessage(
+    teamName + "側のABSチャレンジ！",
+    "正面からのスローリプレイで判定を確認します。"
+  );
+}
+
+// ---------- FREEZE + MEASUREMENT ----------
+
+function showFrozenABS() {
+  const ballCenter = trajectory.closestPoint.clone();
+
+  ball.position.copy(ballCenter);
+  ball.visible = true;
+
+  const boundaryPoint = trajectory.zonePoint.clone();
+
+  absMarker.position.copy(boundaryPoint);
+  absMarker.visible = true;
+
+  if (absConnector) {
+    scene.remove(absConnector);
+    absConnector.geometry.dispose();
+    absConnector.material.dispose();
+    absConnector = null;
+  }
+
+  const direction = boundaryPoint.clone().sub(ballCenter);
+  const centerToBoundary = direction.length();
+
+  if (centerToBoundary > 0.0001) {
+    direction.normalize();
+  } else {
+    direction.set(0, 1, 0);
+  }
+
+  const ballSurfacePoint = ballCenter.clone().addScaledVector(
+    direction,
+    BALL_RADIUS
+  );
+
+  const contactLine = new THREE.BufferGeometry().setFromPoints([
+    ballSurfacePoint,
+    boundaryPoint
+  ]);
+
+  absConnector = new THREE.Line(
+    contactLine,
+    new THREE.LineBasicMaterial({
+      color: isStrikePitch ? 0x46e09b : 0xffbf55,
+      linewidth: 3
+    })
+  );
+
+  scene.add(absConnector);
+
+  zoneVolume.material.color.setHex(
+    isStrikePitch ? 0x42db97 : 0xffa64d
+  );
+
+  zoneVolume.material.opacity = 0.14;
+
+  zoneEdges.material.color.setHex(
+    isStrikePitch ? 0x6dffc0 : 0xffc36a
+  );
+
+  const signedDistance = trajectory.signedDistance;
+
+  if (signedDistance > BALL_RADIUS) {
+    const gap = signedDistance - BALL_RADIUS;
+
+    absGapDescription =
+      "ボール表面からゾーンまで " +
+      (gap * 100).toFixed(1) +
+      " cm 離れている";
+  } else if (signedDistance >= 0) {
+    const overlap = BALL_RADIUS - signedDistance;
+
+    absGapDescription =
+      "ボールがゾーン内へ約 " +
+      (overlap * 100).toFixed(1) +
+      " cm 入り込んでいる";
+  } else {
+    const insideDepth = Math.abs(signedDistance);
+    const overlap = Math.max(0, BALL_RADIUS - insideDepth);
+
+    absGapDescription =
+      "ボール中心は境界から " +
+      (insideDepth * 100).toFixed(1) +
+      " cm 内側 ／ 球体は境界を約 " +
+      (overlap * 100).toFixed(1) +
+      " cm 越えている";
+  }
+
+  // ボールの中心を画面中央にしてズーム
+  replayZoomTarget.copy(ballCenter);
+
+  replayZoomPosition.set(
+    ballCenter.x,
+    ballCenter.y + 0.18,
+    ballCenter.z + 2.35
+  );
+
+  $("absHeadline").textContent = "停止位置を拡大確認";
+  $("absDetail").textContent = absGapDescription;
+  $("absTap").textContent = "ボールを中心に拡大中…";
+
+  phase = "absZoom";
+  phaseTime = 0;
+}
+
+// ---------- FINAL JUDGEMENT ----------
+
+function finalizeCall(fromABS) {
+  const finalStrike = fromABS ? isStrikePitch : initialCall;
+  const umpireWasCorrect = initialCall === isStrikePitch;
+
+  total++;
+
+  if (umpireWasCorrect) {
+    correct++;
+  } else {
+    mistakes++;
+  }
+
+  if (wasChallenged) {
+    const teamName = challengeTeam === "batter"
+      ? "打者"
+      : "投手・捕手";
+
+    const callStatus = umpireWasCorrect
+      ? "判定維持"
+      : "判定変更";
+
+    const absResult = isStrikePitch ? "STRIKE" : "BALL";
+
+    if (umpireWasCorrect) {
+      $("absHeadline").textContent = "判定的中！";
+      setDecisionStatus("判定的中 ✓", "correct");
+    } else {
+      $("absHeadline").textContent = "誤審！";
+      setDecisionStatus("誤審 ×", "wrong");
+    }
+
+    $("absDetail").textContent =
+      "あなたの判定：" +
+      (initialCall ? "STRIKE" : "BALL") +
+      " ／ ABS判定：" +
+      absResult +
+      " ／ " + callStatus +
+      " ／ " + absGapDescription;
+
+    $("absTap").textContent =
+      "画面をタップして次の投球へ";
+
+    absOverlay.classList.remove("hidden");
+
+    setMessage(
+      teamName + "側のチャレンジ：" + callStatus,
+      "ABS最終判定は " + absResult + "。"
+    );
+  } else {
+    $("absHeadline").textContent = "";
+    setDecisionStatus("判定的中 ✓", "correct");
+
+    setMessage(
+      "最終判定：" + (finalStrike ? "STRIKE" : "BALL"),
+      "明確なコース。ABS対象外です。"
+    );
+
+    absOverlay.classList.add("hidden");
+  }
+
+  // 最終判定をカウントに反映
+  if (finalStrike) {
+    strikes++;
+
+    if (strikes >= 3) {
+      outs++;
+      balls = 0;
+      strikes = 0;
+
+      setMessage(
+        $("message").textContent + " 三振！アウト！",
+        $("result").textContent
+      );
+    }
+  } else {
+    balls++;
+
+    if (balls >= 4) {
+      balls = 0;
+      strikes = 0;
+
+      setMessage(
+        $("message").textContent + " フォアボール！",
+        $("result").textContent
+      );
+    }
+  }
+
+  updateScore();
+
+  // 5回目の誤審でゲーム終了
+  if (mistakes >= 5) {
+    phase = "gameOver";
+
+    hideContinue();
+    decisionButtons.classList.add("hidden");
+
+    $("endRank").textContent =
+      STAGES[getStageIndex(Math.max(0, total - 1))].name;
+
+    $("endAccuracy").textContent = $("accuracy").textContent;
+    $("endMistakes").textContent = mistakes + "回";
+    $("endTotal").textContent = total + "球";
+
+    $("endOverlay").classList.remove("hidden");
+    return;
+  }
+
+  // ABSありならタップ、ABSなしなら自動で次の投球
+  if (wasChallenged) {
+    phase = "awaitContinue";
+    showContinue();
+  } else {
+    phase = "autoContinue";
+    launchDelay = 1.15;
+    hideContinue();
+
+    setMessage(
+      $("message").textContent,
+      "次の投球へ進みます。"
+    );
+  }
+}
+
+// ---------- NEXT PITCH ----------
+
+function continueAfterCall() {
+  if (
+    phase !== "awaitContinue" &&
+    phase !== "autoContinue"
+  ) {
+    return;
+  }
+
+  hideContinue();
+  absOverlay.classList.add("hidden");
+
+  ball.visible = false;
+  absMarker.visible = false;
+
+  if (absConnector) {
+    scene.remove(absConnector);
+    absConnector.geometry.dispose();
+    absConnector.material.dispose();
+    absConnector = null;
+  }
+
+  activeCamera = mainCamera;
+  resetMitt();
+  resetZoneAppearance();
+
+  phase = "idle";
+  phaseTime = 0;
+
+  startPitch();
+}
+
+// ---------- NEW GAME ----------
+
+function startGame() {
+  balls = 0;
+  strikes = 0;
+  outs = 0;
+  total = 0;
+  correct = 0;
+  mistakes = 0;
+
+  initialCall = null;
+  wasChallenged = false;
+  challengeTeam = null;
+
+  progress = 0;
+  phaseTime = 0;
+  launchDelay = 0;
+
+  recentPitchHistory = [];
+  updatePitchHistory();
+
+  activeCamera = mainCamera;
+  ball.visible = false;
+  absMarker.visible = false;
+
+  if (absConnector) {
+    scene.remove(absConnector);
+    absConnector.geometry.dispose();
+    absConnector.material.dispose();
+    absConnector = null;
+  }
+
+  resetMitt();
+  resetZoneAppearance();
+
+  pitcher.root.position.set(0, 0, -18.44);
+  pitcher.armR.shoulder.rotation.set(0, 0, 0);
+  pitcher.armL.shoulder.rotation.set(0, 0, 0);
+
+  replayCamera.position.copy(replayNormalPosition);
+  replayCamera.fov = REPLAY_NORMAL_FOV;
+  replayCamera.lookAt(replayNormalTarget);
+  replayCamera.updateProjectionMatrix();
+
+  startOverlay.classList.add("hidden");
+  absOverlay.classList.add("hidden");
+  endOverlay.classList.add("hidden");
+
+  decisionButtons.classList.remove("hidden");
+
+  hideContinue();
+
+  strikeBtn.disabled = true;
+  ballBtn.disabled = true;
+
+  updateScore();
+
+  $("speed").textContent = "---";
+  $("pitchType").textContent = "---";
+
+  setDecisionStatus("判定待ち", "neutral");
+  setMessage("試合開始！", "投球を待っています。");
+
+  phase = "startDelay";
+  launchDelay = 0.65;
+}
+
+// ---------- ANIMATION ----------
+
+const clock = new THREE.Clock();
+
+function smooth(t) {
+  return t * t * (3 - 2 * t);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  const dt = Math.min(clock.getDelta(), 0.04);
+
+  if (phase === "startDelay") {
+    launchDelay -= dt;
+
+    if (launchDelay <= 0) {
+      startPitch();
+    }
+  }
+
+  else if (phase === "windup") {
+    phaseTime += dt;
+
+    pitcher.armR.shoulder.rotation.x = -1.3;
+    pitcher.armL.shoulder.rotation.x = 0.5;
+
+    pitcher.root.position.y =
+      Math.sin(phaseTime * 7) * 0.035;
+
+    if (phaseTime > 0.48) {
+      pitcher.root.position.y = 0;
+      releasePitch();
+    }
+  }
+
+  else if (phase === "flight") {
+    progress += dt / trajectory.duration;
+
+    const t = Math.min(progress, 1);
+
+    ball.position.copy(trajectory.point(t));
+
+    ball.rotation.x += 0.42;
+    ball.rotation.y += 0.58;
+
+    pitcher.armR.shoulder.rotation.x =
+      -1.3 + Math.min(t * 2.0, 2.2);
+
+    if (t > 0.70) {
+      if (!mitt.visible) {
+        prepareMitt();
+      }
+
+      if (t < 0.84) {
+        const tracking = THREE.MathUtils.clamp(
+          (t - 0.70) / 0.14,
+          0,
+          1
+        );
+
+        const p = trajectory.point(t);
+
+        mitt.position.set(
+          THREE.MathUtils.lerp(0, p.x, smooth(tracking)),
+          THREE.MathUtils.lerp(-1.2, p.y, smooth(tracking)),
+          MITT_PLANE_Z
+        );
+      } else {
+        const snap = THREE.MathUtils.clamp(
+          (t - 0.84) / 0.16,
+          0,
+          1
+        );
+
+        const p = trajectory.point(t);
+
+        mitt.position.set(
+          THREE.MathUtils.lerp(
+            p.x,
+            frameTarget.x,
+            smooth(snap) * 0.65
+          ),
+          THREE.MathUtils.lerp(
+            p.y,
+            frameTarget.y,
+            smooth(snap) * 0.65
+          ),
+          MITT_PLANE_Z
+        );
+      }
+    }
+
+    if (t >= 1) {
+      catchBall();
+    }
+  }
+
+  else if (phase === "frameMove") {
+    phaseTime += dt;
+
+    const t = THREE.MathUtils.clamp(
+      phaseTime / 0.095,
+      0,
+      1
+    );
+
+    mitt.position.lerpVectors(
+      mittStart,
+      frameTarget,
+      smooth(t)
+    );
+
+    mitt.position.z = MITT_PLANE_Z;
+
+    if (t >= 1) {
+      phase = "frameHold";
+      phaseTime = 0;
+    }
+  }
+
+  else if (phase === "frameHold") {
+    phaseTime += dt;
+
+    if (phaseTime > 0.15) {
+      finishFraming();
+    }
+  }
+
+  // ABS slow replay
+  else if (phase === "absReplay") {
+    phaseTime += dt;
+
+    const k = THREE.MathUtils.clamp(
+      phaseTime / 2.15,
+      0,
+      1
+    );
+
+    const t = THREE.MathUtils.lerp(
+      replayStartT,
+      replayTargetT,
+      k
+    );
+
+    ball.position.copy(trajectory.point(t));
+
+    ball.rotation.x += 0.28;
+    ball.rotation.y += 0.34;
+
+    if (k >= 1) {
+      showFrozenABS();
+    }
+  }
+
+  // Ball-centered zoom
+  else if (phase === "absZoom") {
+    phaseTime += dt;
+
+    const k = THREE.MathUtils.clamp(
+      phaseTime / REPLAY_ZOOM_DURATION,
+      0,
+      1
+    );
+
+    const eased = smooth(k);
+
+    replayCamera.position.lerpVectors(
+      replayNormalPosition,
+      replayZoomPosition,
+      eased
+    );
+
+    const currentTarget = replayNormalTarget.clone().lerp(
+      replayZoomTarget,
+      eased
+    );
+
+    replayCamera.fov = THREE.MathUtils.lerp(
+      REPLAY_NORMAL_FOV,
+      REPLAY_ZOOM_FOV,
+      eased
+    );
+
+    replayCamera.lookAt(currentTarget);
+    replayCamera.updateProjectionMatrix();
+
+    if (k >= 1) {
+      finalizeCall(true);
+    }
+  }
+
+  // ABSなしなら自動で次へ
+  else if (phase === "autoContinue") {
+    launchDelay -= dt;
+
+    if (launchDelay <= 0) {
+      continueAfterCall();
+    }
+  }
+
+  renderer.render(scene, activeCamera);
+}
+
+// ---------- EVENTS ----------
+
+strikeBtn.addEventListener("click", () => judge(true));
+ballBtn.addEventListener("click", () => judge(false));
+
+$("startBtn").addEventListener("click", startGame);
+$("restartBtn").addEventListener("click", startGame);
+
+$("menuBtn").addEventListener("click", () => {
+  phase = "menu";
+  activeCamera = mainCamera;
+
+  ball.visible = false;
+  mitt.visible = false;
+  absMarker.visible = false;
+
+  if (absConnector) {
+    scene.remove(absConnector);
+    absConnector.geometry.dispose();
+    absConnector.material.dispose();
+    absConnector = null;
+  }
+
+  absOverlay.classList.add("hidden");
+  endOverlay.classList.add("hidden");
+  decisionButtons.classList.add("hidden");
+
+  hideContinue();
+
+  strikeBtn.disabled = true;
+  ballBtn.disabled = true;
+
+  startOverlay.classList.remove("hidden");
+
+  replayCamera.position.copy(replayNormalPosition);
+  replayCamera.fov = REPLAY_NORMAL_FOV;
+  replayCamera.lookAt(replayNormalTarget);
+  replayCamera.updateProjectionMatrix();
+
+  resetZoneAppearance();
+
+  setDecisionStatus("判定待ち", "neutral");
+
+  setMessage(
+    "スタートメニュー",
+    "スタートを押すと試合が始まります。"
+  );
+});
+
+// ABS後、画面をタップして次の投球へ
+gameStage.addEventListener("pointerdown", () => {
+  if (phase === "awaitContinue") {
+    continueAfterCall();
+  }
+});
+
+// ---------- RESIZE ----------
+
+function resize() {
+  const w = gameStage.clientWidth;
+  const h = gameStage.clientHeight;
+
+  if (!w || !h) return;
+
+  mainCamera.aspect = w / h;
+  mainCamera.updateProjectionMatrix();
+
+  replayCamera.aspect = w / h;
+  replayCamera.updateProjectionMatrix();
+
+  renderer.setSize(w, h);
+}
+
+window.addEventListener("resize", resize);
+resize();
+
+// ---------- BOOT ----------
+
+decisionButtons.classList.add("hidden");
+
+strikeBtn.disabled = true;
+ballBtn.disabled = true;
+
+updateScore();
+updatePitchHistory();
+updateStageDisplay();
+
+animate();
+
+setDecisionStatus("判定待ち", "neutral");
+
+setMessage(
+  "スタートメニュー",
+  "スタートを押すと試合が始まります。"
+);
+
+})();
+  </script>
+</body>
+</html>
